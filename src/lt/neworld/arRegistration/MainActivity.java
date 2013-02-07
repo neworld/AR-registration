@@ -1,13 +1,49 @@
 package lt.neworld.arRegistration;
 
 import android.app.Activity;
+import android.hardware.Camera;
 import android.os.Bundle;
 
 public class MainActivity extends Activity {
+	
+	private CamView camView;
+	private Camera camera;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		camView = new CamView(this);
+		setContentView(camView);
+	}
 
-		setContentView(R.layout.activity_main);
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		camera.startPreview();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		camera.stopPreview();
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
+		camera = Camera.open();
+		camView.setCamera(camera);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		camera.release();
+		camView.setCamera(camera = null);
 	}
 }
