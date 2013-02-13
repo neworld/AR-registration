@@ -43,12 +43,8 @@ public class CamView extends SurfaceView {
 	public void setCamera(Camera camera) {
 		this.camera = camera;
 		
-		if (inited && camera != null) {
-			try {
-				camera.setPreviewDisplay(getHolder());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (inited) {
+			attachCamera();
 		}
 	}
 	
@@ -59,18 +55,25 @@ public class CamView extends SurfaceView {
 		
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
-			if (camera == null)
-				return;
-			
-			try {
-				camera.setPreviewDisplay(holder);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			attachCamera();
 		}
 		
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			Camera.Parameters params = camera.getParameters();
+			params.setPreviewSize(width, height);
+			camera.setParameters(params);
 		}
 	}; 
+	
+	private void attachCamera() {
+		if (camera == null || getHolder() == null)
+			return;
+		
+		try {
+			camera.setPreviewDisplay(getHolder());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
