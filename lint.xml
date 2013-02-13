@@ -99,6 +99,7 @@
     <issue id="UnknownId" severity="ignore" />
     <issue id="UnknownIdInLayout" severity="ignore" />
     <issue id="UnlocalizedSms" severity="ignore" />
+    <issue id="UnusedIds" severity="ignore" />
     <issue id="UnusedNamespace" severity="ignore" />
     <issue id="UnusedResources" severity="ignore" />
     <issue id="UseCompoundDrawables" severity="ignore" />
