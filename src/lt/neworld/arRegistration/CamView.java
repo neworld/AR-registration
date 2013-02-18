@@ -75,5 +75,9 @@ public class CamView extends SurfaceView {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}	
+	
+	public Bitmap getBitmap() {
+		return getDrawingCache();
 	}
 }

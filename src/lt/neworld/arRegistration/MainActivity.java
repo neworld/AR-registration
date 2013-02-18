@@ -22,6 +22,22 @@ public class MainActivity extends Activity {
 		super.onResume();
 		
 		camera.startPreview();
+		
+		//start capture frames
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					camView.getBitmap();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
 	}
 
 	@Override
