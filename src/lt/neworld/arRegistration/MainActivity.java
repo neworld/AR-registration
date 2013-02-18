@@ -3,18 +3,27 @@ package lt.neworld.arRegistration;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
 	
 	private CamView camView;
 	private Camera camera;
+	private HUD hud;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		FrameLayout root = new FrameLayout(this);
+		
 		camView = new CamView(this);
-		setContentView(camView);
+		hud = new HUD(this);
+		
+		root.addView(camView);
+		root.addView(hud);
+		
+		setContentView(root);
 	}
 
 	@Override
