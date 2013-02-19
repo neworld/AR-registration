@@ -10,6 +10,7 @@ public class MainActivity extends Activity {
 	private CamView camView;
 	private Camera camera;
 	private HUD hud;
+	private Process process;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,26 +33,14 @@ public class MainActivity extends Activity {
 		
 		camera.startPreview();
 		
-		//start capture frames
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					camView.getBitmap();
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();
+		process = new Process(camView, hud);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		
+		process.stopProcessing();
 		
 		camera.stopPreview();
 	}
