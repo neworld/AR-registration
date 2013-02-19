@@ -16,9 +16,15 @@ public class HUD extends SurfaceView implements Runnable {
 	private int width;
 	private int height;
 	
-	private Paint center = new Paint();
+	private Paint paintTarget = new Paint();
 	
 	private volatile boolean run = false;
+	
+	private boolean initState = true;
+	
+	private float[] targetLines = new float[4*4];
+	private static final int TARGET_LINES_LENGTH = 40;
+	private static final int TARGET_SPACE_FROM_CENTER = 10;
 	
 	public HUD(Context context) {
 		super(context);
@@ -45,8 +51,7 @@ public class HUD extends SurfaceView implements Runnable {
 		holder.setFormat(PixelFormat.TRANSLUCENT);
 		holder.addCallback(surfaceCallback);
 		
-		center.setColor(Color.RED);
-		center.setStyle(Paint.Style.FILL);
+		paintTarget.setStyle(Paint.Style.STROKE);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -68,14 +73,43 @@ public class HUD extends SurfaceView implements Runnable {
 		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 			HUD.this.width = width;
 			HUD.this.height = height;
+			
+			int middleX = width / 2;
+			int middleY = height / 2;
+			
+			targetLines[0] = middleX - TARGET_SPACE_FROM_CENTER - TARGET_LINES_LENGTH;
+			targetLines[2] = middleX - TARGET_SPACE_FROM_CENTER;
+			targetLines[4] = middleX + TARGET_SPACE_FROM_CENTER + TARGET_LINES_LENGTH;
+			targetLines[6] = middleX + TARGET_SPACE_FROM_CENTER;
+			targetLines[1] = targetLines[3] = targetLines[5] = targetLines[7] = middleY;
+			
+			targetLines[8] = targetLines[10] = targetLines[12] = targetLines[14] = middleX;
+			targetLines[9] = middleY - TARGET_SPACE_FROM_CENTER - TARGET_LINES_LENGTH;
+			targetLines[11] = middleY - TARGET_SPACE_FROM_CENTER;
+			targetLines[13] = middleY + TARGET_SPACE_FROM_CENTER + TARGET_LINES_LENGTH;
+			targetLines[15] = middleY + TARGET_SPACE_FROM_CENTER;
 		}
 	};
+	
+	private void drawTarget(Canvas canvas) {
+		paintTarget.setColor(Color.YELLOW);
+		canvas.drawLines(targetLines, paintTarget);
+		canvas.drawPoint(width / 2, height / 2, paintTarget);
+		
+		canvas.save();
+		canvas.translate(1, 1);
+		paintTarget.setColor(Color.BLACK);
+		canvas.drawLines(targetLines, paintTarget);
+		canvas.drawPoint(width / 2, height / 2, paintTarget);
+		canvas.restore();
+	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 		
-		canvas.drawRect(new Rect(width / 2 - 5, height / 2 - 5,  5, 5), center);
+		if (initState)
+			drawTarget(canvas);
 	}
 
 	@Override
