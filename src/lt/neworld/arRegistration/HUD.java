@@ -12,19 +12,22 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class HUD extends SurfaceView implements Runnable {
+
+	private volatile boolean run = false;
 	
 	private int width;
 	private int height;
 	
 	private Paint paintTarget = new Paint();
-	
-	private volatile boolean run = false;
+	private Paint paintFrameRate = new Paint();
 	
 	private boolean initState = true;
 	
 	private float[] targetLines = new float[4*4];
 	private static final int TARGET_LINES_LENGTH = 40;
 	private static final int TARGET_SPACE_FROM_CENTER = 10;
+	
+	private int frameRate = 0;
 	
 	public HUD(Context context) {
 		super(context);
@@ -52,6 +55,9 @@ public class HUD extends SurfaceView implements Runnable {
 		holder.addCallback(surfaceCallback);
 		
 		paintTarget.setStyle(Paint.Style.STROKE);
+		
+		paintFrameRate.setStyle(Paint.Style.FILL_AND_STROKE);
+		paintFrameRate.setTextSize(25);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -104,12 +110,27 @@ public class HUD extends SurfaceView implements Runnable {
 		canvas.restore();
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+	private void drawFrameRate(Canvas canvas) {
+		canvas.save();
+		canvas.translate(1, 1);
+		paintFrameRate.setColor(Color.BLACK);
+		canvas.drawText(String.format("FPS: %d", frameRate), width - 130, 30, paintFrameRate);
+		canvas.restore();
 		
-		if (initState)
-			drawTarget(canvas);
+		paintFrameRate.setColor(Color.YELLOW);
+		canvas.drawText(String.format("FPS: %d", frameRate), width - 130, 30, paintFrameRate);
+	}
+	
+	@Override
+	protected final void onDraw(Canvas canvas) {
+		synchronized (this) {
+			canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+			
+			if (initState)
+				drawTarget(canvas);
+			
+			drawFrameRate(canvas);
+		}
 	}
 
 	@Override
@@ -124,6 +145,12 @@ public class HUD extends SurfaceView implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public final void setFrameRate(int frameRate) {
+		synchronized (this) {
+			this.frameRate = frameRate;
 		}
 	}
 }
