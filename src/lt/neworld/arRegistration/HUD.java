@@ -70,7 +70,7 @@ public class HUD extends SurfaceView implements Runnable {
 			HUD.this.height = height;
 		}
 	};
-
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
@@ -86,7 +86,7 @@ public class HUD extends SurfaceView implements Runnable {
 			onDraw(canvas);
 			getHolder().unlockCanvasAndPost(canvas);
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1000 / 24);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
