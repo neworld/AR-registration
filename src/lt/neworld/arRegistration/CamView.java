@@ -34,6 +34,8 @@ public class CamView extends SurfaceView {
 	}
 	
 	private void init() {
+		setDrawingCacheEnabled(true);
+		
 		SurfaceHolder holder = getHolder();
 
 		holder.setFormat(PixelFormat.OPAQUE);
