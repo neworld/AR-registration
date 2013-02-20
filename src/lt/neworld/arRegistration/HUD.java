@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -20,6 +21,7 @@ public class HUD extends SurfaceView implements Runnable {
 	
 	private Paint paintTarget = new Paint();
 	private Paint paintFrameRate = new Paint();
+	private Paint paintPickedColor = new Paint();
 	
 	private boolean initState = true;
 	
@@ -28,6 +30,9 @@ public class HUD extends SurfaceView implements Runnable {
 	private static final int TARGET_SPACE_FROM_CENTER = 10;
 	
 	private int frameRate = 0;
+	
+	private int pickedUpColor = 0;
+	private static final Rect pickedUpRect = new Rect(10, 10, 32, 32);
 	
 	public HUD(Context context) {
 		super(context);
@@ -58,6 +63,9 @@ public class HUD extends SurfaceView implements Runnable {
 		
 		paintFrameRate.setStyle(Paint.Style.FILL_AND_STROKE);
 		paintFrameRate.setTextSize(25);
+
+		paintFrameRate.setStyle(Paint.Style.FILL);
+		paintPickedColor.setTextSize(25);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -128,9 +136,28 @@ public class HUD extends SurfaceView implements Runnable {
 			
 			if (initState)
 				drawTarget(canvas);
+			else
+				drawPickedColor(canvas);
 			
 			drawFrameRate(canvas);
 		}
+	}
+
+	private void drawPickedColor(Canvas canvas) {
+		paintFrameRate.setColor(pickedUpColor);
+		canvas.drawRect(pickedUpRect, paintFrameRate);
+		paintFrameRate.setColor(Color.BLACK);
+		paintFrameRate.setStyle(Paint.Style.STROKE);
+		canvas.drawRect(pickedUpRect, paintFrameRate);
+		paintFrameRate.setStyle(Paint.Style.FILL);
+		
+		canvas.save();
+		canvas.translate(1, 1);
+		canvas.drawText("Picked color", 40, 30, paintFrameRate);
+		canvas.restore();
+		
+		paintFrameRate.setColor(Color.YELLOW);
+		canvas.drawText("Picked color", 40, 30, paintFrameRate);
 	}
 
 	@Override
@@ -138,8 +165,12 @@ public class HUD extends SurfaceView implements Runnable {
 		while (run) {
 			Canvas canvas = null;
 			canvas = getHolder().lockCanvas();
-			onDraw(canvas);
-			getHolder().unlockCanvasAndPost(canvas);
+			
+			if (canvas != null) {
+				onDraw(canvas);
+				getHolder().unlockCanvasAndPost(canvas);
+			}
+			
 			try {
 				Thread.sleep(1000 / 24);
 			} catch (InterruptedException e) {
@@ -151,6 +182,17 @@ public class HUD extends SurfaceView implements Runnable {
 	public final void setFrameRate(int frameRate) {
 		synchronized (this) {
 			this.frameRate = frameRate;
+		}
+	}
+	
+	public Point getSize() {
+		return new Point(width, height);
+	}
+	
+	public void setPickedUpColor(int color) {
+		synchronized (this) {
+			pickedUpColor = color;
+			initState = false;
 		}
 	}
 }
