@@ -1,6 +1,7 @@
 package lt.neworld.arRegistration;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,6 +34,8 @@ public class HUD extends SurfaceView implements Runnable {
 	
 	private int pickedUpColor = 0;
 	private static final Rect pickedUpRect = new Rect(10, 10, 32, 32);
+	
+	private Bitmap drawBitmapOnCenter = null;
 	
 	public HUD(Context context) {
 		super(context);
@@ -133,13 +136,19 @@ public class HUD extends SurfaceView implements Runnable {
 	protected final void onDraw(Canvas canvas) {
 		synchronized (this) {
 			canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+			drawTarget(canvas);
 			
-			if (initState)
-				drawTarget(canvas);
-			else
+			if (!initState)
 				drawPickedColor(canvas);
 			
 			drawFrameRate(canvas);
+			
+			if (drawBitmapOnCenter != null)
+				canvas.drawBitmap(drawBitmapOnCenter, 
+						(width - drawBitmapOnCenter.getWidth()) / 2, 
+						(height - drawBitmapOnCenter.getHeight()) / 2,
+						paintTarget);
 		}
 	}
 
@@ -194,5 +203,9 @@ public class HUD extends SurfaceView implements Runnable {
 			pickedUpColor = color;
 			initState = false;
 		}
+	}
+	
+	public void setDrawBitmapOnCenter(Bitmap bmp) {
+		drawBitmapOnCenter = bmp;
 	}
 }
