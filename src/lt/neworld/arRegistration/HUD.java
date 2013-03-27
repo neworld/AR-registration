@@ -1,5 +1,7 @@
 package lt.neworld.arRegistration;
 
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,6 +25,7 @@ public class HUD extends SurfaceView implements Runnable {
 	private Paint paintTarget = new Paint();
 	private Paint paintFrameRate = new Paint();
 	private Paint paintPickedColor = new Paint();
+	private Paint paintFeatures = new Paint();
 	
 	private boolean initState = true;
 	
@@ -36,6 +39,8 @@ public class HUD extends SurfaceView implements Runnable {
 	private static final Rect pickedUpRect = new Rect(10, 10, 32, 32);
 	
 	private Bitmap drawBitmapOnCenter = null;
+	
+	private List<Feature> features = null;
 	
 	public HUD(Context context) {
 		super(context);
@@ -69,6 +74,9 @@ public class HUD extends SurfaceView implements Runnable {
 
 		paintFrameRate.setStyle(Paint.Style.FILL);
 		paintPickedColor.setTextSize(25);
+		
+		paintFeatures.setColor(Color.GREEN);
+		paintFeatures.setStyle(Paint.Style.STROKE);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -149,7 +157,15 @@ public class HUD extends SurfaceView implements Runnable {
 						(width - drawBitmapOnCenter.getWidth()) / 2, 
 						(height - drawBitmapOnCenter.getHeight()) / 2,
 						paintTarget);
+			
+			drawFeatures(canvas);
 		}
+	}
+
+	private void drawFeatures(Canvas canvas) {
+		if (features != null)
+			for (Feature feature : features)
+				canvas.drawRect(feature.getRect(), paintFeatures);
 	}
 
 	private void drawPickedColor(Canvas canvas) {
@@ -207,5 +223,9 @@ public class HUD extends SurfaceView implements Runnable {
 	
 	public void setDrawBitmapOnCenter(Bitmap bmp) {
 		drawBitmapOnCenter = bmp;
+	}
+
+	public void pushFeatures(List<Feature> features) {
+		this.features = features;
 	}
 }

@@ -1,6 +1,9 @@
 package lt.neworld.arRegistration;
 
-import android.graphics.Bitmap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import android.graphics.Color;
 import android.graphics.Point;
 import android.view.View;
@@ -23,6 +26,9 @@ public class Process extends Thread {
 	private boolean needPickUpColor = false;
 	private byte pickedUpColorU;
 	private byte pickedUpColorV;
+	private boolean pickedUp = false;
+	
+	private final static byte COLOR_TRESHOLD = 10;
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -49,10 +55,87 @@ public class Process extends Thread {
 				pickUpColor(buffer);
 			
 			updateFrames();
+			
+			if (pickedUp) {
+				process(buffer, buffer.length, hud.getSize().x, pickedUpColorU, pickedUpColorV);
+				/*
+				List<Feature> features = process(buffer, hud.getSize().x, pickedUpColorU, pickedUpColorV);
+				hud.pushFeatures(features);
+				*/
+			}
+			
 			Thread.yield();
 		}
 	}
 	
+	private native int[] process(byte[] buffer, int size, int width, byte pickedUpColorU, byte pickedUpColorV);
+	/*
+	private List<Feature> process() {
+		boolean[] checked = new boolean[buffer.length / 4];
+		boolean[] good = new boolean[buffer.length / 4];
+		
+		Point size = hud.getSize();
+		
+		int minX, minY, maxX, maxY;
+		
+		Stack<Integer> steps = new Stack<Integer>();
+		ArrayList<Feature> features = new ArrayList<Feature>();
+		
+		int founded = 0;
+		
+		for (int i = 0, index = buffer.length / 2; index < buffer.length; index += 2, i++)
+			good[i] = Math.abs(buffer[i] - pickedUpColorU) <= COLOR_TRESHOLD && Math.abs(buffer[i + 1] - pickedUpColorV) <= COLOR_TRESHOLD;
+		
+		for (int index = 0; index < good.length; index += 2) {
+			if (checked[index])
+				continue;
+			
+			checked[index] = true;
+			
+			if (good[index]) {
+				minX = maxX = index % size.x;
+				minY = maxY = index / size.x;
+				steps.add(index);
+				while (steps.size() > 0) {
+					int i = steps.pop();
+					
+					int ii = i - size.x;
+					if (ii >= 0 && !checked[ii] && good[ii]) {
+						checked[ii] = true;
+						steps.add(ii);
+						minY = Math.min(minY, ii / size.x);
+					}
+					
+					ii = i - 1;
+					if (ii >= 0 && !checked[ii] && good[ii]) {
+						checked[ii] = true;
+						steps.add(ii);
+						minX = Math.min(minX, ii % size.x);
+					}
+					
+					ii = i + 1;
+					if (ii < checked.length && !checked[ii] && good[ii]) {
+						checked[ii] = true;
+						steps.add(ii);
+						maxX = Math.max(maxX,  ii % size.x);
+					}
+					
+					ii = i + size.x;
+					if (ii < checked.length && !checked[ii] && good[ii]) {
+						checked[ii] = true;
+						steps.add(ii);
+						maxY = Math.max(maxY, ii / size.x);
+					}
+				}
+				
+				features.add(new Feature(++founded, minX, minY, maxX, maxY));
+			}
+		}
+		
+		return features;
+	}
+	*/
+
 	private void pickUpColor(byte[] buffer) {
 		int cy = 0, 
 			cu = 0,
@@ -135,6 +218,7 @@ public class Process extends Thread {
 		
 		int pickedUpColor = Color.rgb(r, g, b);
 		needPickUpColor = false;
+		pickedUp = true;
 		
 		hud.setPickedUpColor(pickedUpColor);
 		//hud.setDrawBitmapOnCenter(Bitmap.createBitmap(pixels, COLOR_PICKING_AREA, COLOR_PICKING_AREA, Bitmap.Config.ARGB_8888));
