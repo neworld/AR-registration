@@ -12,7 +12,8 @@ public class Feature {
 		this.maxY = maxY;
 	}
 	
-	public Rect getRect() {
-		return new Rect(minX, minY, maxX, maxY);
+	public Rect getRect(float scaleX, float scaleY) {
+		return new Rect((int)(minX * scaleX), (int)(minY * scaleY), (int)(maxX * scaleX), (int) (maxY * scaleY));
+		//return new Rect((int)(minX * 2), (int)(minY * 2), (int)(maxX * 2), (int) (maxY * 2 * scaleY));
 	}
 }

@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
 		
 		camView = new CamView(this);
 		hud = new HUD(this);
+		hud.attachCamView(camView);
 		
 		root.addView(camView);
 		root.addView(hud);

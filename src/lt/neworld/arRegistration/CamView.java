@@ -4,14 +4,12 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 public class CamView extends SurfaceView {
 	
@@ -20,6 +18,10 @@ public class CamView extends SurfaceView {
 	
 	private Object lockCameraBuffer = new Object();
 	private byte[] cameraBuffer = null;
+	
+	private static final int SCALE_FACTOR = 1;
+	
+	public int width, height;
 	
 	public CamView(Context context) {
 		super(context);
@@ -40,12 +42,12 @@ public class CamView extends SurfaceView {
 	}
 	
 	private void init() {
-		setDrawingCacheEnabled(true);
-		setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		//setDrawingCacheEnabled(true);
+		//setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		
 		SurfaceHolder holder = getHolder();
 
-		holder.setFormat(PixelFormat.OPAQUE);
+		//holder.setFormat(PixelFormat.OPAQUE);
 		holder.addCallback(surfaceCallback);
 	}
 	
@@ -68,13 +70,19 @@ public class CamView extends SurfaceView {
 		}
 		
 		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		public void surfaceChanged(SurfaceHolder holder, int format, int _width, int _height) {
+			width = _width / SCALE_FACTOR;
+			height = _height / SCALE_FACTOR;
+			
+			width = 640;
+			height = 480;
+			
 			Camera.Parameters params = camera.getParameters();
 			params.setPreviewFormat(ImageFormat.NV21);
 			params.setPreviewSize(width, height);
 			camera.setParameters(params);
 			synchronized (lockCameraBuffer) {
-				cameraBuffer = new byte[width * height * ImageFormat.getBitsPerPixel(ImageFormat.NV21)];	
+				cameraBuffer = new byte[width * height * ImageFormat.getBitsPerPixel(ImageFormat.NV21) / 8];	
 			}
 		}
 	};
@@ -115,5 +123,17 @@ public class CamView extends SurfaceView {
 			}
 			return cameraBuffer;
 		}
+	}
+	
+	public Point getSize() {
+		return new Point(width, height);
+	}
+	
+	public float getScaleX() {
+		return (float) getWidth() / width;
+	}
+	
+	public float getScaleY() {
+		return (float) getHeight() / height;
 	}
 }

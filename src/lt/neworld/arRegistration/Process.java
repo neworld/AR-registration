@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.view.View;
@@ -22,13 +24,15 @@ public class Process extends Thread {
 	private long[] frames = new long[FRAMES_FOR_COUNT];
 	private byte framesHead = 0;
 	
-	private static final int COLOR_PICKING_AREA = 16;
+	private static final int COLOR_PICKING_AREA = 4;
 	private boolean needPickUpColor = false;
-	private byte pickedUpColorU;
-	private byte pickedUpColorV;
+	private int pickedUpColorU;
+	private int pickedUpColorV;
+	private int pickedUpColorY;
 	private boolean pickedUp = false;
 	
-	private final static byte COLOR_TRESHOLD = 10;
+	private final static byte COLOR_TRESHOLD = 30;
+	private final static byte LUMA_TRESHOLD = 50;
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -36,6 +40,10 @@ public class Process extends Thread {
 			needPickUpColor = true;
 		}
 	};
+	
+	static {
+		System.loadLibrary("process");
+	}
 	
 	public Process(CamView camView, HUD hud) {
 		this.camView = camView;
@@ -57,11 +65,11 @@ public class Process extends Thread {
 			updateFrames();
 			
 			if (pickedUp) {
-				process(buffer, buffer.length, hud.getSize().x, pickedUpColorU, pickedUpColorV);
-				/*
-				List<Feature> features = process(buffer, hud.getSize().x, pickedUpColorU, pickedUpColorV);
+				//process(buffer, buffer.length, camView.width, pickedUpColorU, pickedUpColorV);
+				
+				List<Feature> features = process2();
 				hud.pushFeatures(features);
-				*/
+				
 			}
 			
 			Thread.yield();
@@ -69,12 +77,15 @@ public class Process extends Thread {
 	}
 	
 	private native int[] process(byte[] buffer, int size, int width, byte pickedUpColorU, byte pickedUpColorV);
-	/*
-	private List<Feature> process() {
-		boolean[] checked = new boolean[buffer.length / 4];
-		boolean[] good = new boolean[buffer.length / 4];
+	
+	private List<Feature> process2() {
+		Point size = camView.getSize();
+		final int imageSize = size.x * size.y;
 		
-		Point size = hud.getSize();
+		int[] img = new int[imageSize / 4];
+		
+		boolean[] checked = new boolean[imageSize / 4];
+		boolean[] good = new boolean[imageSize / 4];
 		
 		int minX, minY, maxX, maxY;
 		
@@ -82,9 +93,23 @@ public class Process extends Thread {
 		ArrayList<Feature> features = new ArrayList<Feature>();
 		
 		int founded = 0;
+		int lumaAdr;
 		
-		for (int i = 0, index = buffer.length / 2; index < buffer.length; index += 2, i++)
-			good[i] = Math.abs(buffer[i] - pickedUpColorU) <= COLOR_TRESHOLD && Math.abs(buffer[i + 1] - pickedUpColorV) <= COLOR_TRESHOLD;
+		for (int i = 0, index = imageSize; index < buffer.length; index += 2, i++) {
+			lumaAdr = (i - i % size.x) * 4 + i % size.x * 2;
+			
+			good[i] = Math.abs(buffer[index + 1] & 0xFF  - pickedUpColorU) <= COLOR_TRESHOLD && 
+					  Math.abs(buffer[index] & 0xFF - pickedUpColorV) <= COLOR_TRESHOLD &&
+					  Math.abs(buffer[lumaAdr] & 0xFF - pickedUpColorY) <= LUMA_TRESHOLD;
+			
+			
+			
+			img[i] = good[i]? Color.GREEN : 0;
+			//img[i] = 0x50000000 + 0x10101 * (buffer[lumaAdr] & 0xFF);
+		}
+		
+		//hud.setDrawBitmapOnScreen(Bitmap.createBitmap(img, size.x / 2, size.y / 2, Bitmap.Config.ARGB_8888));
+		
 		
 		for (int index = 0; index < good.length; index += 2) {
 			if (checked[index])
@@ -113,7 +138,7 @@ public class Process extends Thread {
 						minX = Math.min(minX, ii % size.x);
 					}
 					
-					ii = i + 1;
+					ii += 2;
 					if (ii < checked.length && !checked[ii] && good[ii]) {
 						checked[ii] = true;
 						steps.add(ii);
@@ -128,30 +153,25 @@ public class Process extends Thread {
 					}
 				}
 				
-				features.add(new Feature(++founded, minX, minY, maxX, maxY));
+				features.add(new Feature(++founded, minX * 2, minY * 2, maxX * 2, maxY * 2));
 			}
 		}
 		
+		
 		return features;
 	}
-	*/
+	
 
 	private void pickUpColor(byte[] buffer) {
 		int cy = 0, 
 			cu = 0,
 			cv = 0;
 		
-		Point size = hud.getSize();
+		Point size = camView.getSize();
 		
 		int mainOffset = size.x * size.y;
 		int blockOffsetY = (size.y - COLOR_PICKING_AREA) / 2 * size.x;
 		int blockOffsetX = (size.x - COLOR_PICKING_AREA) / 2;
-		
-		if (blockOffsetY % 2 != 0)
-			blockOffsetY++;
-		
-		if (blockOffsetX % 2 != 0)
-			blockOffsetX++;
 		
 		int[] pixels = new int[COLOR_PICKING_AREA * COLOR_PICKING_AREA];
 		
@@ -163,8 +183,15 @@ public class Process extends Thread {
 					
 					cy += buffer[offsetY + offsetX] & 0xFF;
 					
-					cu += buffer[mainOffset + (offsetY >> 1) + offsetX + 1] & 0xFF;
-					cv += buffer[mainOffset + (offsetY >> 1) + offsetX] & 0xFF;
+					int adr = mainOffset + (offsetY >> 1) + offsetX;
+					
+					if (adr % 2 != 0) {
+						cu += buffer[adr] & 0xFF;
+						cv += buffer[adr + 1] & 0xFF;
+					} else {
+						cu += buffer[adr + 1] & 0xFF;
+						cv += buffer[adr] & 0xFF;
+					}
 					
 					/*
 					////////////////////////
@@ -175,9 +202,16 @@ public class Process extends Thread {
 			        int y2 = buffer[i+1]&0xff;
 			        int y3 = buffer[width+i  ]&0xff;
 			        int y4 = buffer[width+i+1]&0xff;
-			 
-			        int u =  buffer[mainOffset + (offsetY >> 1) + offsetX + 1] & 0xFF;
-			        int v = buffer[mainOffset + (offsetY >> 1) + offsetX] & 0xFF;
+			        
+			        int u, v;
+			        
+					if (adr % 2 != 0) {
+						u = buffer[adr] & 0xFF;
+						v = buffer[adr + 1] & 0xFF;
+					} else {
+						u = buffer[adr + 1] & 0xFF;
+						v = buffer[adr] & 0xFF;
+					}
 			        u = u-128;
 			        v = v-128;
 			        
@@ -199,11 +233,12 @@ public class Process extends Thread {
 		cu /= dalmuo;
 		cv /= dalmuo;
 		
+		pickedUpColorU = cu;
+		pickedUpColorV = cv;
+		pickedUpColorY = cy;
+		
 		cu -= 128;
 		cv -= 128;
-		
-		pickedUpColorU = (byte) (cu & 0xFF);
-		pickedUpColorV = (byte) (cv & 0xFF);
 		
 		int r, g, b;
 		

@@ -39,8 +39,11 @@ public class HUD extends SurfaceView implements Runnable {
 	private static final Rect pickedUpRect = new Rect(10, 10, 32, 32);
 	
 	private Bitmap drawBitmapOnCenter = null;
+	private Bitmap drawBitmapOnScreen = null;
 	
 	private List<Feature> features = null;
+	
+	private CamView camView = null;
 	
 	public HUD(Context context) {
 		super(context);
@@ -158,14 +161,24 @@ public class HUD extends SurfaceView implements Runnable {
 						(height - drawBitmapOnCenter.getHeight()) / 2,
 						paintTarget);
 			
+			if (drawBitmapOnScreen != null) {
+				Rect src = new Rect(0, 0, drawBitmapOnScreen.getWidth(), drawBitmapOnScreen.getHeight());
+				Rect des = new Rect(0, 0, width, height);
+				
+				canvas.drawBitmap(drawBitmapOnScreen, src, des, paintTarget);
+			}
+			
 			drawFeatures(canvas);
 		}
 	}
 
 	private void drawFeatures(Canvas canvas) {
+		float scaleX = camView.getScaleX();
+		float scaleY = camView.getScaleY();
+		
 		if (features != null)
 			for (Feature feature : features)
-				canvas.drawRect(feature.getRect(), paintFeatures);
+				canvas.drawRect(feature.getRect(scaleX, scaleY), paintFeatures);
 	}
 
 	private void drawPickedColor(Canvas canvas) {
@@ -227,5 +240,17 @@ public class HUD extends SurfaceView implements Runnable {
 
 	public void pushFeatures(List<Feature> features) {
 		this.features = features;
+	}
+
+	public Bitmap getDrawBitmapOnScreen() {
+		return drawBitmapOnScreen;
+	}
+
+	public void setDrawBitmapOnScreen(Bitmap drawBitmapOnScreen) {
+		this.drawBitmapOnScreen = drawBitmapOnScreen;
+	}
+
+	public void attachCamView(CamView camView) {
+		this.camView = camView;
 	}
 }
