@@ -114,6 +114,7 @@
     <issue id="Wakelock" severity="ignore" />
     <issue id="WorldReadableFiles" severity="ignore" />
     <issue id="WorldWriteableFiles" severity="ignore" />
+    <issue id="WrongCall" severity="ignore" />
     <issue id="WrongFolder" severity="ignore" />
     <issue id="WrongManifestParent" severity="ignore" />
     <issue id="WrongViewCast" severity="ignore" />
