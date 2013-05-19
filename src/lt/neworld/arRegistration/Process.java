@@ -31,8 +31,11 @@ public class Process extends Thread {
 	private int pickedUpColorY;
 	private boolean pickedUp = false;
 	
-	private final static byte COLOR_TRESHOLD = 30;
-	private final static byte LUMA_TRESHOLD = 50;
+	private final static byte COLOR_TRESHOLD = 20;
+	private final static byte LUMA_TRESHOLD = 40;
+	
+	private int[] checks = new int[25];
+	private Point lastSize = null;
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -42,7 +45,7 @@ public class Process extends Thread {
 	};
 	
 	static {
-		System.loadLibrary("process");
+		//System.loadLibrary("process");
 	}
 	
 	public Process(CamView camView, HUD hud) {
@@ -58,6 +61,14 @@ public class Process extends Thread {
 	public void run() {
 		while (run) {
 			buffer = camView.getBitmap();
+			
+			if (lastSize == null || !lastSize.equals(camView.getSize())) {
+				lastSize = camView.getSize();
+				for (int x = -2; x <= 2; x++)
+					for (int y = -2; y <= 2; y++) {
+						checks[x+2 + 5 * (y + 2)] = x + lastSize.x * y;
+					}
+			}
 			
 			if (needPickUpColor)
 				pickUpColor(buffer);
@@ -104,7 +115,7 @@ public class Process extends Thread {
 			
 			
 			
-			img[i] = good[i]? Color.GREEN : 0;
+			//img[i] = good[i]? Color.GREEN : 0;
 			//img[i] = 0x50000000 + 0x10101 * (buffer[lumaAdr] & 0xFF);
 		}
 		
@@ -124,36 +135,28 @@ public class Process extends Thread {
 				while (steps.size() > 0) {
 					int i = steps.pop();
 					
-					int ii = i - size.x;
-					if (ii >= 0 && !checked[ii] && good[ii]) {
-						checked[ii] = true;
-						steps.add(ii);
-						minY = Math.min(minY, ii / size.x);
-					}
-					
-					ii = i - 1;
-					if (ii >= 0 && !checked[ii] && good[ii]) {
-						checked[ii] = true;
-						steps.add(ii);
-						minX = Math.min(minX, ii % size.x);
-					}
-					
-					ii += 2;
-					if (ii < checked.length && !checked[ii] && good[ii]) {
-						checked[ii] = true;
-						steps.add(ii);
-						maxX = Math.max(maxX,  ii % size.x);
-					}
-					
-					ii = i + size.x;
-					if (ii < checked.length && !checked[ii] && good[ii]) {
-						checked[ii] = true;
-						steps.add(ii);
-						maxY = Math.max(maxY, ii / size.x);
+					for (int delta : checks) {
+						int ii = i + delta;
+						if (ii >= 0 && ii < checked.length && !checked[ii] && good[ii]) {
+							checked[ii] = true;
+							steps.add(ii);
+							int newY = ii / size.x;
+							int newX = ii % size.x;
+							
+							if (newY < minY)
+								minY = newY;
+							else if (newY > maxY)
+								maxY = newY;
+							
+							if (newX < minX)
+								minX = newX;
+							else if (newX > maxX)
+								maxX = newX;
+						}
 					}
 				}
 				
-				features.add(new Feature(++founded, minX * 2, minY * 2, maxX * 2, maxY * 2));
+				features.add(new Feature(++founded, minX * 2, minY * 4, maxX * 2, maxY * 4));
 			}
 		}
 		
