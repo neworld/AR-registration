@@ -17,4 +17,13 @@ public class Feature {
 		return new Rect((int)(minX * scaleX), (int)(minY * scaleY), (int)(maxX * scaleX), (int) (maxY * scaleY));
 		//return new Rect((int)(minX * 2), (int)(minY * 2), (int)(maxX * 2), (int) (maxY * 2 * scaleY));
 	}
+	
+	public int calcDif(Feature feature) {
+		return Math.abs(feature.maxX - maxX) + Math.abs(feature.maxY - maxY) + Math.abs(feature.minX - minX) + Math.abs(feature.minY - minY);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("[%d %d %d %d]", minX, minY, maxX, maxY);
+	}
 }

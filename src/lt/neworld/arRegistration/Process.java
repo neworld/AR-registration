@@ -1,13 +1,13 @@
 package lt.neworld.arRegistration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -36,6 +36,8 @@ public class Process extends Thread {
 	
 	private int[] checks = new int[25];
 	private Point lastSize = null;
+	
+	private final FeaturesCorrection featuresCorrection = new FeaturesCorrection();
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -79,6 +81,7 @@ public class Process extends Thread {
 				//process(buffer, buffer.length, camView.width, pickedUpColorU, pickedUpColorV);
 				
 				List<Feature> features = process2();
+				featuresCorrection.calculateFeatures(features);
 				hud.pushFeatures(features);
 				
 			}
@@ -126,6 +129,12 @@ public class Process extends Thread {
 			if (checked[index])
 				continue;
 			
+			if (index % size.x > size.x / 2)
+				index = (index / size.x + 1) * size.x;
+			
+			if (index >= good.length)
+				break;
+			
 			checked[index] = true;
 			
 			if (good[index]) {
@@ -161,6 +170,7 @@ public class Process extends Thread {
 			}
 		}
 		
+		//Log.d("Features", Arrays.toString(features.toArray()));
 		
 		return features;
 	}
