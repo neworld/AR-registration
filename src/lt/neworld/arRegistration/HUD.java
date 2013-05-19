@@ -80,6 +80,7 @@ public class HUD extends SurfaceView implements Runnable {
 		
 		paintFeatures.setColor(Color.GREEN);
 		paintFeatures.setStyle(Paint.Style.STROKE);
+		paintFeatures.setTextSize(30);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -177,8 +178,11 @@ public class HUD extends SurfaceView implements Runnable {
 		float scaleY = camView.getScaleY();
 		
 		if (features != null)
-			for (Feature feature : features)
-				canvas.drawRect(feature.getRect(scaleX, scaleY), paintFeatures);
+			for (Feature feature : features) {
+				Rect rect = feature.getRect(scaleX, scaleY);
+				canvas.drawRect(rect, paintFeatures);
+				canvas.drawText(String.valueOf(feature.id), rect.right + 10, rect.bottom, paintFeatures);
+			}
 	}
 
 	private void drawPickedColor(Canvas canvas) {

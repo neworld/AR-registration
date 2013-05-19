@@ -31,7 +31,7 @@ public class Process extends Thread {
 	private int pickedUpColorY;
 	private boolean pickedUp = false;
 	
-	private final static byte COLOR_TRESHOLD = 30;
+	private final static byte COLOR_TRESHOLD = 20;
 	private final static byte LUMA_TRESHOLD = 50;
 	
 	private int[] checks = new int[25];
@@ -156,7 +156,8 @@ public class Process extends Thread {
 					}
 				}
 				
-				features.add(new Feature(++founded, minX * 2, minY * 4, maxX * 2, maxY * 4));
+				if (maxX - minX > 10 && maxY - minY > 10)
+					features.add(new Feature(++founded, minX * 2, minY * 4, maxX * 2, maxY * 4));
 			}
 		}
 		
