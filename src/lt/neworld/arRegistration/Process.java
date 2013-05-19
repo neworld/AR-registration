@@ -31,8 +31,8 @@ public class Process extends Thread {
 	private int pickedUpColorY;
 	private boolean pickedUp = false;
 	
-	private final static byte COLOR_TRESHOLD = 20;
-	private final static byte LUMA_TRESHOLD = 40;
+	private final static byte COLOR_TRESHOLD = 30;
+	private final static byte LUMA_TRESHOLD = 50;
 	
 	private int[] checks = new int[25];
 	private Point lastSize = null;
