@@ -5,16 +5,21 @@
     <issue id="AlwaysShowAction" severity="ignore" />
     <issue id="ButtonCase" severity="ignore" />
     <issue id="ButtonOrder" severity="ignore" />
+    <issue id="ButtonStyle" severity="ignore" />
     <issue id="CommitPrefEdits" severity="ignore" />
+    <issue id="CommitTransaction" severity="ignore" />
     <issue id="ContentDescription" severity="ignore" />
+    <issue id="CutPasteId" severity="ignore" />
     <issue id="DalvikOverride" severity="ignore" />
     <issue id="DefaultLocale" severity="ignore" />
     <issue id="Deprecated" severity="ignore" />
     <issue id="DisableBaselineAlignment" severity="ignore" />
     <issue id="DrawAllocation" severity="ignore" />
     <issue id="DuplicateActivity" severity="ignore" />
+    <issue id="DuplicateDefinition" severity="ignore" />
     <issue id="DuplicateIds" severity="ignore" />
     <issue id="DuplicateIncludedIds" severity="ignore" />
+    <issue id="DuplicateUsesFeature" severity="ignore" />
     <issue id="EnforceUTF8" severity="ignore" />
     <issue id="ExportedActivity" severity="ignore" />
     <issue id="ExportedContentProvider" severity="ignore" />
@@ -35,40 +40,57 @@
     <issue id="IconDuplicates" severity="ignore" />
     <issue id="IconDuplicatesConfig" severity="ignore" />
     <issue id="IconExtension" severity="ignore" />
+    <issue id="IconLauncherShape" severity="ignore" />
     <issue id="IconLocation" severity="ignore" />
     <issue id="IconMissingDensityFolder" severity="ignore" />
+    <issue id="IconMixedNinePatch" severity="ignore" />
     <issue id="IconNoDpi" severity="ignore" />
+    <issue id="IconXmlAndPng" severity="ignore" />
+    <issue id="IllegalResourceRef" severity="ignore" />
     <issue id="InOrMmUsage" severity="ignore" />
     <issue id="InconsistentArrays" severity="ignore" />
+    <issue id="InconsistentLayout" severity="ignore" />
     <issue id="InefficientWeight" severity="ignore" />
+    <issue id="InlinedApi" severity="ignore" />
     <issue id="InnerclassSeparator" severity="ignore" />
     <issue id="Instantiatable" severity="ignore" />
+    <issue id="InvalidPackage" severity="ignore" />
+    <issue id="JavascriptInterface" severity="ignore" />
     <issue id="LabelFor" severity="ignore" />
     <issue id="LibraryCustomView" severity="ignore" />
     <issue id="LocalSuppress" severity="ignore" />
     <issue id="MangledCRLF" severity="ignore" />
     <issue id="ManifestOrder" severity="ignore" />
+    <issue id="ManifestTypo" severity="ignore" />
     <issue id="MenuTitle" severity="ignore" />
     <issue id="MergeRootFrame" severity="ignore" />
+    <issue id="MissingApplicationIcon" severity="ignore" />
     <issue id="MissingId" severity="ignore" />
     <issue id="MissingPrefix" severity="ignore" />
+    <issue id="MissingQuantity" severity="ignore" />
     <issue id="MissingRegistered" severity="ignore" />
     <issue id="MissingTranslation" severity="ignore" />
+    <issue id="MissingVersion" severity="ignore" />
     <issue id="MultipleUsesSdk" severity="ignore" />
     <issue id="NamespaceTypo" severity="ignore" />
     <issue id="NestedScrolling" severity="ignore" />
     <issue id="NestedWeights" severity="ignore" />
     <issue id="NewApi" severity="ignore" />
+    <issue id="NotSibling" severity="ignore" />
     <issue id="ObsoleteLayoutParam" severity="ignore" />
     <issue id="OldTargetApi" severity="ignore" />
     <issue id="OnClick" severity="ignore" />
+    <issue id="Orientation" severity="ignore" />
     <issue id="Overdraw" severity="ignore" />
+    <issue id="Override" severity="ignore" />
     <issue id="PackagedPrivateKey" severity="ignore" />
+    <issue id="ParcelCreator" severity="ignore" />
     <issue id="PrivateResource" severity="ignore" />
     <issue id="Proguard" severity="ignore" />
     <issue id="ProguardSplit" severity="ignore" />
     <issue id="ProtectedPermissions" severity="ignore" />
     <issue id="PxUsage" severity="ignore" />
+    <issue id="Recycle" severity="ignore" />
     <issue id="Registered" severity="ignore" />
     <issue id="RequiredSize" severity="ignore" />
     <issue id="ResourceAsColor" severity="ignore" />
@@ -76,15 +98,18 @@
     <issue id="ScrollViewSize" severity="ignore" />
     <issue id="SdCardPath" severity="ignore" />
     <issue id="SecureRandom" severity="ignore" />
+    <issue id="ServiceCast" severity="ignore" />
     <issue id="SetJavaScriptEnabled" severity="ignore" />
     <issue id="ShowToast" severity="ignore" />
     <issue id="SimpleDateFormat" severity="ignore" />
+    <issue id="SmallSp" severity="ignore" />
     <issue id="SpUsage" severity="ignore" />
     <issue id="StateListReachable" severity="ignore" />
     <issue id="StringFormatCount" severity="ignore" />
     <issue id="StringFormatInvalid" severity="ignore" />
     <issue id="StringFormatMatches" severity="ignore" />
     <issue id="StyleCycle" severity="ignore" />
+    <issue id="Suspicious0dp" severity="ignore" />
     <issue id="SuspiciousImport" severity="ignore" />
     <issue id="TextFields" severity="ignore" />
     <issue id="TextViewEdits" severity="ignore" />
@@ -101,6 +126,7 @@
     <issue id="UnlocalizedSms" severity="ignore" />
     <issue id="UnusedIds" severity="ignore" />
     <issue id="UnusedNamespace" severity="ignore" />
+    <issue id="UnusedQuantity" severity="ignore" />
     <issue id="UnusedResources" severity="ignore" />
     <issue id="UseCompoundDrawables" severity="ignore" />
     <issue id="UseSparseArrays" severity="ignore" />
@@ -115,6 +141,7 @@
     <issue id="WorldReadableFiles" severity="ignore" />
     <issue id="WorldWriteableFiles" severity="ignore" />
     <issue id="WrongCall" severity="ignore" />
+    <issue id="WrongCase" severity="ignore" />
     <issue id="WrongFolder" severity="ignore" />
     <issue id="WrongManifestParent" severity="ignore" />
     <issue id="WrongViewCast" severity="ignore" />
