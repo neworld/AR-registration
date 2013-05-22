@@ -5,12 +5,18 @@ import android.graphics.Rect;
 public class Feature {
 	public int id, minX, minY, maxX, maxY;
 	
+	private int oriX;
+	private int oriY;
+	
 	public Feature(int id, int minX, int minY, int maxX, int maxY) {
 		this.id = id;
 		this.minX = minX;
 		this.minY = minY;
 		this.maxX = maxX;
 		this.maxY = maxY;
+
+		oriX = getX();
+		oriY = getY();
 	}
 	
 	public Rect getRect(float scaleX, float scaleY) {
@@ -19,11 +25,29 @@ public class Feature {
 	}
 	
 	public int calcDif(Feature feature) {
-		return Math.abs(feature.maxX - maxX) + Math.abs(feature.maxY - maxY) + Math.abs(feature.minX - minX) + Math.abs(feature.minY - minY);
+		return Math.abs(feature.oriX - oriX) + Math.abs(feature.oriY - oriY);
 	}
 
 	@Override
 	public String toString() {
 		return String.format("[%d %d %d %d]", minX, minY, maxX, maxY);
+	}
+	
+	public int getX() {
+		return (minX + maxX) / 2;
+	}
+	
+	public int getY() {
+		return (minY + maxY) / 2;
+	}
+	
+	public void correct(int x, int y) {
+		oriX = getX();
+		oriY = getY();
+		
+		minX += x - oriX;
+		maxX += x - oriX;
+		minY += y - oriY;
+		maxY += y - oriY;
 	}
 }

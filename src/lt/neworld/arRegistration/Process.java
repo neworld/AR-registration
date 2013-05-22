@@ -1,13 +1,13 @@
 package lt.neworld.arRegistration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
+import lt.neworld.arRegistration.prediction.KalmanFilterPredictor;
+import lt.neworld.arRegistration.prediction.Predictor;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -38,6 +38,11 @@ public class Process extends Thread {
 	private Point lastSize = null;
 	
 	private final FeaturesCorrection featuresCorrection = new FeaturesCorrection();
+	
+	private long lastFrameTime;
+	private double timeBetweenFrames;
+	
+	private Predictor predictor = new KalmanFilterPredictor();
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -82,6 +87,10 @@ public class Process extends Thread {
 				
 				List<Feature> features = process2();
 				featuresCorrection.calculateFeatures(features);
+				
+				if (timeBetweenFrames > 0)
+					predictor.predict(features, timeBetweenFrames);
+				
 				hud.pushFeatures(features);
 				
 			}
@@ -297,6 +306,11 @@ public class Process extends Thread {
 		
 		if (last > 0)
 			hud.setFrameRate((int) (1000000000 / ((current - last) / FRAMES_FOR_COUNT)));
+		
+		if (lastFrameTime > 0)
+			timeBetweenFrames = (double)(current - lastFrameTime) / 1000000000;
+		
+		lastFrameTime = current;
 	}
 	
 	public void stopProcessing() {
