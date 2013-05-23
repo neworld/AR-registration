@@ -5,8 +5,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import android.util.Log;
+
 public class FeaturesCorrection {
 	private List<Feature> lastFeatures;
+	
+	private double percent = 0.0;
+	private int steps = 0;
 	
 	public void calculateFeatures(List<Feature> features) {
 		HashSet<Integer> used = new HashSet<Integer>();
@@ -37,6 +42,10 @@ public class FeaturesCorrection {
 					if (!used.contains(oldFeature.id)) {
 						newFeatures.remove(newFeature);
 						used.add(oldFeature.id);
+						if (min >= 5) {
+							percent += oldFeature.correctionPercent(newFeature);
+							steps++;
+						}
 					}
 				}
 			}
@@ -52,6 +61,12 @@ public class FeaturesCorrection {
 					}
 				}
 			}
+		}
+		
+		if (steps > 20) {
+			Log.v("MEASURED", String.format("Correction: %.2f%%", (percent * 100) / steps));
+			percent = 0;
+			steps = 0;
 		}
 		
 		lastFeatures = new ArrayList<Feature>(features);

@@ -30,6 +30,23 @@ public class Feature {
 		
 		return (int) Math.sqrt(diffX * diffX + diffY * diffY);
 	}
+	
+	public double correctionPercent(Feature feature) {
+		int diffX = feature.oriX - oriX;
+		int diffY = feature.oriY - oriY;
+		
+		double measuredDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+		
+		diffX = feature.oriX - getX();
+		diffY = feature.oriY - getY();
+		
+		double distance = Math.sqrt(diffX * diffX + diffY * diffY);
+		
+		if (Math.abs(measuredDistance) < 5)
+			return measuredDistance < distance? 0 : 1;
+		
+		return 1 - distance / measuredDistance;
+	}
 
 	@Override
 	public String toString() {

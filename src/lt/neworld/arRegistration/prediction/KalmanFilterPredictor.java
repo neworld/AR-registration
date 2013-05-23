@@ -145,7 +145,7 @@ class MyMeasurementModel implements MeasurementModel {
 	
 	private double T;
 	
-	private static final double measurementNoise = 0.5d;
+	private static final double measurementNoise = 0.2d;
 	
 	private static final RealMatrix R = new Array2DRowRealMatrix(new double[][] { 
 			{Math.pow(measurementNoise, 2), 0},
