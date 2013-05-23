@@ -25,7 +25,10 @@ public class Feature {
 	}
 	
 	public int calcDif(Feature feature) {
-		return Math.abs(feature.oriX - oriX) + Math.abs(feature.oriY - oriY);
+		int diffX = feature.oriX - oriX;
+		int diffY = feature.oriY - oriY;
+		
+		return (int) Math.sqrt(diffX * diffX + diffY * diffY);
 	}
 
 	@Override
@@ -42,9 +45,6 @@ public class Feature {
 	}
 	
 	public void correct(int x, int y) {
-		oriX = getX();
-		oriY = getY();
-		
 		minX += x - oriX;
 		maxX += x - oriX;
 		minY += y - oriY;

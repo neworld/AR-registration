@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import lt.neworld.arRegistration.prediction.KalmanFilterPredictor;
+import lt.neworld.arRegistration.prediction.AlphaBetaGammaPredictor;
 import lt.neworld.arRegistration.prediction.Predictor;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -42,7 +42,8 @@ public class Process extends Thread {
 	private long lastFrameTime;
 	private double timeBetweenFrames;
 	
-	private Predictor predictor = new KalmanFilterPredictor();
+	//private Predictor predictor = new KalmanFilterPredictor();
+	private Predictor predictor = new AlphaBetaGammaPredictor();
 	
 	private OnClickListener onColorPickListener = new OnClickListener() {
 		@Override
@@ -88,8 +89,7 @@ public class Process extends Thread {
 				List<Feature> features = process2();
 				featuresCorrection.calculateFeatures(features);
 				
-				if (timeBetweenFrames > 0)
-					predictor.predict(features, timeBetweenFrames);
+				//if (timeBetweenFrames > 0) predictor.predict(features, timeBetweenFrames);
 				
 				hud.pushFeatures(features);
 				
