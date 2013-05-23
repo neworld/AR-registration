@@ -11,39 +11,44 @@ public class FeaturesCorrection {
 	public void calculateFeatures(List<Feature> features) {
 		HashSet<Integer> used = new HashSet<Integer>();
 		
+		List<Feature> newFeatures = new ArrayList<Feature>(features);
+		
 		if (lastFeatures != null) {
-			for (Feature newFeature : features) {
+			while (newFeatures.size() > 0 && lastFeatures.size() > 0) {
 				Feature oldFeature = null;
+				Feature newFeature = null;
 				int min = -1;
-				Iterator<Feature> iter = lastFeatures.iterator();
-				while (iter.hasNext()) {
-					Feature feature = iter.next();
-					int diff = feature.calcDif(newFeature);
-					if (min == -1 || min > diff) {
-						min = diff;
-						oldFeature = feature;
+				
+				for (Feature nf : newFeatures) {
+					for (Feature feature : lastFeatures) {
+						int diff = feature.calcDif(nf);
+						if (min == -1 || min > diff) {
+							min = diff;
+							oldFeature = feature;
+							newFeature = nf;
+						}
 					}
 				}
 				
-				if (oldFeature != null) {
+				if (oldFeature != null && newFeature != null) {
 					newFeature.id = oldFeature.id;
 					lastFeatures.remove(oldFeature);
-					used.add(oldFeature.id);
-				} else {
-					newFeature.id = 0;
+					
+					if (!used.contains(oldFeature.id)) {
+						newFeatures.remove(newFeature);
+						used.add(oldFeature.id);
+					}
 				}
 			}
 			
 			int index = 0;
 			
-			for (Feature feature : features) {
-				if (feature.id == 0) {
-					while (true) {
-						index++;
-						if (!used.contains(index)) {
-							feature.id = index;
-							break;
-						}
+			for (Feature feature : newFeatures) {
+				while (true) {
+					index++;
+					if (!used.contains(index)) {
+						feature.id = index;
+						break;
 					}
 				}
 			}

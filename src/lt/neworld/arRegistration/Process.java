@@ -89,7 +89,7 @@ public class Process extends Thread {
 				List<Feature> features = process2();
 				featuresCorrection.calculateFeatures(features);
 				
-				//if (timeBetweenFrames > 0) predictor.predict(features, timeBetweenFrames);
+				if (timeBetweenFrames > 0) predictor.predict(features, timeBetweenFrames);
 				
 				hud.pushFeatures(features);
 				
