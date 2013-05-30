@@ -2,7 +2,7 @@ package lt.neworld.arRegistration.prediction;
 
 import java.util.List;
 
-import lt.neworld.arRegistration.Feature;
+import lt.neworld.arRegistration.Cluster;
 
 import org.apache.commons.math3.filter.KalmanFilter;
 import org.apache.commons.math3.filter.MeasurementModel;
@@ -18,23 +18,23 @@ public class KalmanFilterPredictor implements Predictor {
 	
 	private SparseArray<Filter> filters = new SparseArray<Filter>();
 
-	public void predict(Feature feature, double T) {
-		Filter filter = filters.get(feature.id);
+	public void predict(Cluster cluster, double T) {
+		Filter filter = filters.get(cluster.id);
 		if (filter == null) {
 			MyProcessModel processModel = new MyProcessModel();
-			processModel.setInit(feature.getX(), feature.getY());
+			processModel.setInit(cluster.getX(), cluster.getY());
 			MyMeasurementModel measuredModel = new MyMeasurementModel();
 			
-			filter = new Filter(processModel, measuredModel, feature);
-			filters.append(feature.id, filter);
+			filter = new Filter(processModel, measuredModel, cluster);
+			filters.append(cluster.id, filter);
 		} else {
-			filter.updateAndPredict(feature, T);
+			filter.updateAndPredict(cluster, T);
 		}
 	}
 
 	@Override
-	public void predict(List<Feature> features, double T) {
-		for (Feature feature : features)
+	public void predict(List<Cluster> features, double T) {
+		for (Cluster feature : features)
 			predict(feature, T);
 	}
 }
@@ -49,22 +49,19 @@ class Filter extends KalmanFilter {
 	double prevVelocityX;
 	double prevVelocityY;
 	
-	public Filter(MyProcessModel processModel, MyMeasurementModel measurementModel, Feature feature) {
+	public Filter(MyProcessModel processModel, MyMeasurementModel measurementModel, Cluster cluster) {
 		super(processModel, measurementModel);
 		
 		this.processModel = processModel;
 		this.measurementModel = measurementModel;
 		
-		prevX = feature.getX();
-		prevY = feature.getY();
+		prevX = cluster.getX();
+		prevY = cluster.getY();
 	}
 	
-	public void updateAndPredict(Feature feature, double T) {
-		processModel.setT(T);
-		measurementModel.setT(T);
-		
-		int x = feature.getX();
-		int y = feature.getY();
+	public void updateAndPredict(Cluster cluster, double T) {
+		int x = cluster.getX();
+		int y = cluster.getY();
 		
 		double velocityX = (x - prevX) / T;
 		double velocityY = (y - prevY) / T;
@@ -73,12 +70,15 @@ class Filter extends KalmanFilter {
 		double ay = (velocityY - prevVelocityY) / T;
 		
 		double a = Math.sqrt(ax * ax + ay * ay);
+
+		processModel.setT(T * a);
+		measurementModel.setT(T * a);
 		
 		predict(new ArrayRealVector(new double[] { a }));
 		correct(new ArrayRealVector(new double[] { x, y }));
 		
 		double[] pos = getStateEstimation();
-		feature.correct((int)pos[0], (int)pos[1]);
+		cluster.correct((int)pos[0], (int)pos[1]);
 	}
 }
 
@@ -87,7 +87,7 @@ class MyProcessModel implements ProcessModel {
 	private int x;
 	private int y;
 	
-	private static final double accelNoise = 2d;
+	private static final double accelNoise = 0.5d;
 
 	@Override
 	public RealMatrix getControlMatrix() {
@@ -118,7 +118,7 @@ class MyProcessModel implements ProcessModel {
 				{0, t3, 0, T}
 		});
 		
-		return tmp.scalarMultiply(Math.pow(accelNoise, 2));
+		return tmp.scalarMultiply(accelNoise);
 	}
 
 	@Override
@@ -147,11 +147,6 @@ class MyMeasurementModel implements MeasurementModel {
 	
 	private static final double measurementNoise = 0.2d;
 	
-	private static final RealMatrix R = new Array2DRowRealMatrix(new double[][] { 
-			{Math.pow(measurementNoise, 2), 0},
-			{0, Math.pow(measurementNoise, 2)}
-	});
-
 	@Override
 	public RealMatrix getMeasurementMatrix() {
 		return new Array2DRowRealMatrix(new double[][] {
@@ -162,7 +157,12 @@ class MyMeasurementModel implements MeasurementModel {
 
 	@Override
 	public RealMatrix getMeasurementNoise() {
-		return R;
+		double t4 = Math.pow(T, 4) / 4;
+		
+		return new Array2DRowRealMatrix(new double[][] { 
+				{t4, 0},
+				{0, t4}
+		}).scalarMultiply(measurementNoise);
 	}
 	
 	public void setT(double T) {

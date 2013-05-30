@@ -25,7 +25,7 @@ public class HUD extends SurfaceView implements Runnable {
 	private Paint paintTarget = new Paint();
 	private Paint paintFrameRate = new Paint();
 	private Paint paintPickedColor = new Paint();
-	private Paint paintFeatures = new Paint();
+	private Paint paintClusters = new Paint();
 	
 	private boolean initState = true;
 	
@@ -41,7 +41,7 @@ public class HUD extends SurfaceView implements Runnable {
 	private Bitmap drawBitmapOnCenter = null;
 	private Bitmap drawBitmapOnScreen = null;
 	
-	private List<Feature> features = null;
+	private List<Cluster> clusters = null;
 	
 	private CamView camView = null;
 	
@@ -78,9 +78,9 @@ public class HUD extends SurfaceView implements Runnable {
 		paintFrameRate.setStyle(Paint.Style.FILL);
 		paintPickedColor.setTextSize(25);
 		
-		paintFeatures.setColor(Color.GREEN);
-		paintFeatures.setStyle(Paint.Style.STROKE);
-		paintFeatures.setTextSize(30);
+		paintClusters.setColor(Color.GREEN);
+		paintClusters.setStyle(Paint.Style.STROKE);
+		paintClusters.setTextSize(30);
 	}
 	
 	private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -169,19 +169,19 @@ public class HUD extends SurfaceView implements Runnable {
 				canvas.drawBitmap(drawBitmapOnScreen, src, des, paintTarget);
 			}
 			
-			drawFeatures(canvas);
+			drawClusters(canvas);
 		}
 	}
 
-	private void drawFeatures(Canvas canvas) {
+	private void drawClusters(Canvas canvas) {
 		float scaleX = camView.getScaleX();
 		float scaleY = camView.getScaleY();
 		
-		if (features != null)
-			for (Feature feature : features) {
-				Rect rect = feature.getRect(scaleX, scaleY);
-				canvas.drawRect(rect, paintFeatures);
-				canvas.drawText(String.valueOf(feature.id), rect.right + 10, rect.bottom, paintFeatures);
+		if (clusters != null)
+			for (Cluster cluster : clusters) {
+				Rect rect = cluster.getRect(scaleX, scaleY);
+				canvas.drawRect(rect, paintClusters);
+				canvas.drawText(String.valueOf(cluster.id), rect.right + 10, rect.bottom, paintClusters);
 			}
 	}
 
@@ -242,8 +242,8 @@ public class HUD extends SurfaceView implements Runnable {
 		drawBitmapOnCenter = bmp;
 	}
 
-	public void pushFeatures(List<Feature> features) {
-		this.features = features;
+	public void pushClusters(List<Cluster> clusters) {
+		this.clusters = clusters;
 	}
 
 	public Bitmap getDrawBitmapOnScreen() {

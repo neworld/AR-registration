@@ -37,7 +37,7 @@ public class Process extends Thread {
 	private int[] checks = new int[25];
 	private Point lastSize = null;
 	
-	private final FeaturesCorrection featuresCorrection = new FeaturesCorrection();
+	private final ClustersCorrection clustersCorrection = new ClustersCorrection();
 	
 	private long lastFrameTime;
 	private double timeBetweenFrames;
@@ -86,12 +86,12 @@ public class Process extends Thread {
 			if (pickedUp) {
 				//process(buffer, buffer.length, camView.width, pickedUpColorU, pickedUpColorV);
 				
-				List<Feature> features = process2();
-				featuresCorrection.calculateFeatures(features);
+				List<Cluster> clusters = process2();
+				clustersCorrection.calculateClusters(clusters);
 				
-				if (timeBetweenFrames > 0) predictor.predict(features, timeBetweenFrames);
+				if (timeBetweenFrames > 0) predictor.predict(clusters, timeBetweenFrames);
 				
-				hud.pushFeatures(features);
+				hud.pushClusters(clusters);
 				
 			}
 			
@@ -101,7 +101,7 @@ public class Process extends Thread {
 	
 	private native int[] process(byte[] buffer, int size, int width, byte pickedUpColorU, byte pickedUpColorV);
 	
-	private List<Feature> process2() {
+	private List<Cluster> process2() {
 		Point size = camView.getSize();
 		final int imageSize = size.x * size.y;
 		
@@ -113,7 +113,7 @@ public class Process extends Thread {
 		int minX, minY, maxX, maxY;
 		
 		Stack<Integer> steps = new Stack<Integer>();
-		ArrayList<Feature> features = new ArrayList<Feature>();
+		ArrayList<Cluster> clusters = new ArrayList<Cluster>();
 		
 		int founded = 0;
 		int lumaAdr;
@@ -175,13 +175,13 @@ public class Process extends Thread {
 				}
 				
 				if (maxX - minX > 10 && maxY - minY > 10)
-					features.add(new Feature(++founded, minX * 2, minY * 4, maxX * 2, maxY * 4));
+					clusters.add(new Cluster(++founded, minX * 2, minY * 4, maxX * 2, maxY * 4));
 			}
 		}
 		
 		//Log.d("Features", Arrays.toString(features.toArray()));
 		
-		return features;
+		return clusters;
 	}
 	
 
