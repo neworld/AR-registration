@@ -110,12 +110,13 @@ class MyProcessModel implements ProcessModel {
 	public RealMatrix getProcessNoise() {
 		double t4 = Math.pow(T, 4) / 4;
 		double t3 = Math.pow(T, 3) / 2;
+		double t2 = Math.pow(T, 2);
 		
 		RealMatrix tmp = new Array2DRowRealMatrix(new double[][] {
 				{t4, 0, t3, 0},
 				{0, t4, 0, t3},
-				{t3, 0, T, 0},
-				{0, t3, 0, T}
+				{t3, 0, t2, 0},
+				{0, t3, 0, t2}
 		});
 		
 		return tmp.scalarMultiply(accelNoise);
